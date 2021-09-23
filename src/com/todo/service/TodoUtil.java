@@ -86,27 +86,29 @@ public class TodoUtil {
 	}
 
 	public static void listAll(TodoList l) {
+		
 		System.out.println("전체 할 일 목록\n제목 , 내용\n");
 		for (TodoItem item : l.getList()) {
-			System.out.println( item.getTitle() + " , " + item.getDesc());
+			System.out.println( item.getTitle() + " , " + item.getDesc()+" , "+item.getCurrent_date());
 		}
 	}
 	
 	public static void saveList(TodoList l,String file) throws IOException {
 		//file open
-		FileWriter f = new FileWriter("todolist.txt",true);
+		FileWriter f = new FileWriter(file,false);
 		for (TodoItem item : l.getList()) {
 			f.write(item.toSaveSTring());
-			f.flush();
+			//f.flush();
 		}
 		//file close
 		f.close();
 	}
+	
 	public static void loadList(TodoList l,String file) {
 		int num=0;
 		BufferedReader bf;
 		try {
-			bf = new BufferedReader(new FileReader("todoList.txt"));
+			bf = new BufferedReader(new FileReader(file));
 			String s;
 			while((s=bf.readLine())!=null) {
 				StringTokenizer st=new StringTokenizer(s);

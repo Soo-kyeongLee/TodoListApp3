@@ -37,9 +37,9 @@ public class TodoList {
 
 	public void listAll() {
 		System.out.println("\n"
-				+ "inside list_All method\n");
+				+ "[할 일 목록]\n");
 		for (TodoItem myitem : list) {
-			System.out.println(myitem.getTitle() + myitem.getDesc());
+			System.out.println(myitem.getTitle()+","+ myitem.getDesc()+","+myitem.getCurrent_date());
 		}
 	}
 	
@@ -55,9 +55,9 @@ public class TodoList {
 		return list.indexOf(t);
 	}
 
-	public Boolean isDuplicate(String title) {
+	public Boolean isDuplicate(String cate, String title) {
 		for (TodoItem item : list) {
-			if (title.equals(item.getTitle())) return true;
+			if (cate.equals(item.getCategory())&&title.equals(item.getTitle())) return true;
 		}
 		return false;
 	}

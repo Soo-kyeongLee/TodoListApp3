@@ -2,6 +2,7 @@ package com.todo;
 
 import java.io.IOException;
 import java.util.Scanner;
+import java.util.StringTokenizer;
 
 import com.todo.dao.TodoList;
 import com.todo.menu.Menu;
@@ -21,7 +22,8 @@ public class TodoMain {
 		do {
 			Menu.prompt();
 			isList = false;
-			String choice = sc.next();
+			String choice = sc.nextLine();
+
 			switch (choice) {
 
 			case "add":
@@ -65,7 +67,18 @@ public class TodoMain {
 				break;
 
 			default:
-				System.out.println("존재하지 않는 선택지 (메뉴 다시 보기_help)");
+				if(choice.length()>5) {
+					StringTokenizer st =new StringTokenizer(choice);
+					String x=st.nextToken();
+					//System.out.println(x);
+					if(x.equals("find")){
+						String x2=st.nextToken();
+						//System.out.println(x2);
+						TodoUtil.find(l,x2);
+					}
+				}else {
+					System.out.println("존재하지 않는 선택지 (메뉴 다시 보기_help)");
+				}
 				break;
 			}
 			

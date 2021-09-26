@@ -11,6 +11,7 @@ public class Menu {
         System.out.println("#이름으로 오름차순 정렬_ls_name_asc");
         System.out.println("#이름으로 내림차순 정렬_ls_name_desc");
         System.out.println("#작성날짜로 정렬_ls_date");
+        System.out.println("#키워드로 찾기_find 키워드");
         System.out.println("#나가기_exit");
 
     }

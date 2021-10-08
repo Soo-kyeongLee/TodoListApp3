@@ -34,7 +34,7 @@ public class TodoMain {
 				TodoUtil.deleteItem(l);
 				break;
 				
-			case "edit":
+			case "edit2222":
 				TodoUtil.updateItem(l);
 				break;
 				

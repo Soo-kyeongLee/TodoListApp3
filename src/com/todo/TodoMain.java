@@ -17,7 +17,7 @@ public class TodoMain {
 		boolean isList = false;
 		boolean quit = false;
 		String fileLo="C:\\Users\\user\\git\\TodoListApp\\src\\com\\todo\\service\\todolist.txt";
-		TodoUtil.loadList(l,fileLo);
+		l.importData(fileLo);
 		Menu.displaymenu();
 		do {
 			Menu.prompt();
@@ -34,28 +34,47 @@ public class TodoMain {
 				TodoUtil.deleteItem(l);
 				break;
 				
-			case "edit2222":
+			case "edit":
 				TodoUtil.updateItem(l);
 				break;
 				
 			case "ls":
-				TodoUtil.listAll(l);
+				TodoUtil.listAll(l,"id",1);
 				break;
-
+				
+			case "ls_cate":
+				TodoUtil.listCateAll(l);
+				break;
+				
 			case "ls_name_asc":
-				l.sortByName();
+				System.out.println("제목순으로 정렬");
+				TodoUtil.listAll(l,"title",1);
 				isList = true;
 				break;
 
 			case "ls_name_desc":
-				l.sortByName();
-				l.reverseList();
-				isList = true;
+				System.out.println("제목역순으로 정렬");
+				TodoUtil.listAll(l,"title",0);
 				break;
 				
 			case "ls_date":
-				l.sortByDate();
-				isList = true;
+				System.out.println("마감날짜순으로 정렬");
+				TodoUtil.listAll(l,"due_date",1);
+				break;
+				
+			case "ls_date_desc":
+				System.out.println("날짜역순으로 정렬");
+				TodoUtil.listAll(l,"due_date",0);
+				break;
+				
+			case "find":
+				String keyword=sc.nextLine().trim();
+				TodoUtil.findList(l,keyword);
+				break;
+			
+			case "find_cate":
+				String cate=sc.nextLine().trim();
+				TodoUtil.findCateList(l,cate);
 				break;
 				
 			case "help":
@@ -67,23 +86,8 @@ public class TodoMain {
 				break;
 
 			default:
-				if(choice.length()>5) {
-					StringTokenizer st =new StringTokenizer(choice);
-					String x=st.nextToken();
-					//System.out.println(x);
-					if(x.equals("find")){
-						String x2=st.nextToken();
-						//System.out.println(x2);
-						TodoUtil.find(l,x2);
-					}
-				}else {
-					System.out.println("존재하지 않는 선택지 (메뉴 다시 보기_help)");
-				}
-				break;
+				System.out.println("존재하지 않는 선택지 (메뉴 다시 보기_help)");
 			}
-			
-			if(isList) l.listAll();
 		} while (!quit);
-		TodoUtil.saveList(l,fileLo);
 	}
 }

@@ -4,13 +4,14 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class TodoItem {
+	private int id;
 	private String category;
     private String title;
     private String desc;
     private String current_date;
     private String due_date;
 
-    public TodoItem(String category, String title, String desc, String due_date){
+    public TodoItem(String title, String desc, String category, String due_date){
     	this.category=category;
         this.title=title;
         this.desc=desc;
@@ -19,10 +20,26 @@ public class TodoItem {
         this.due_date=due_date;
     }
     
+    public TodoItem(String title, String desc, String category, String due_date, String currD){
+    	this.category=category;
+        this.title=title;
+        this.desc=desc;
+        this.current_date=currD;
+        this.due_date=due_date;
+    }
+    
     public TodoItem(){
     }
     
-    public String getCategory() {
+    public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public String getCategory() {
 		return category;
 	}
 
@@ -64,8 +81,8 @@ public class TodoItem {
     
     @Override
 	public String toString() {
-		return "TodoItem [category=" + category + ", title=" + title + ", desc=" + desc + ", current_date="
-				+ current_date + ", due_date=" + due_date + "]";
+		return id+" [" + category + "] " + title + ", " + desc + ", "
+				+ current_date + " - " + due_date;
 	}
 
 	public String toSaveSTring() {

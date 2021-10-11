@@ -3,6 +3,8 @@ package com.todo.service;
 import java.util.*;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.io.FileReader;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -27,107 +29,76 @@ public class TodoUtil {
 				+ "##할 일 제목:\n");
 		
 		title = sc.nextLine();
-		if (list.isDuplicate(cate, title)) {
-			System.out.printf("같은 카테고리에 겹치는 제목 존재\n");
+		if(list.isDuplicate(cate,title)) {
+			System.out.println(cate+"내에서 제목 중복");
 			return;
 		}
-		
 		System.out.println("##할 일 구체적인 내용:");
 		desc = sc.nextLine();
 		
 		System.out.println("##마감일_yyy/mm/dd:");
 		end = sc.nextLine();
 		
-		TodoItem t = new TodoItem(cate, title, desc, end);
-		list.addItem(t);
+		TodoItem t = new TodoItem(title, desc, cate, end);
+		if(list.addItem(t)>0) {
+			System.out.println("추가됨");
+		}
 	}
 
 	public static void deleteItem(TodoList l) {
 		
 		Scanner sc = new Scanner(System.in);
-		listAll(l);
+		listAll(l,"id",1);
 		System.out.println("\n"
 				+ "#목록에서 할 일 삭제하기\n"
 				+ "##삭제할 할 항목 번호:");
-		int Num = sc.nextInt();
+		int idx = sc.nextInt();
 		 sc.nextLine();
-		int cnt=0;
-		for (TodoItem item : l.getList()) {
-			cnt++;
-			if(cnt==Num) {
-				System.out.println(item.toString()+"을 실제로 삭제하시겠습니까?(y)\n");
-				String check=sc.nextLine();
-				if(!check.equalsIgnoreCase("y")) {
-					break;
-				}
-				l.deleteItem(item);
-				break;
-			}
-		}
-		if (cnt<Num||cnt<=0) {
-			System.out.println("존재하지 않는 항목\n");
-			return;
-		}
-		
+		 if(l.deleteItem(idx)>0) {
+			 System.out.println("삭제됨");
+		 }
 	}
 
-
-	public static void updateItem(TodoList l) {
+	public static void updateItem(TodoList l) {	
+		Scanner sc=new Scanner(System.in);
 		
-		Scanner sc = new Scanner(System.in);
-		listAll(l);
 		System.out.println("\n"
 				+ "#할 일 내용 수정하기\n"
 				+ "##업데이트할 항목 번호");
 		int num = sc.nextInt();
-		 sc.nextLine();
-		int cnt=0;
-		for (TodoItem item : l.getList()) {
-			cnt++;
-			if(cnt==num) {
-				String cate=item.getCategory();
-				System.out.println("##"+item.getTitle()+"의 새로운 제목:");
-				String new_title = sc.nextLine().trim();
-				if (l.isDuplicate(cate,new_title)) {
-					System.out.println("하나의 카테고리에 겹치는 제목 존재\n");
-					return;
-				}
-				System.out.println("##"+new_title+"의 새로운 내용:");
-				String new_description = sc.nextLine().trim();
-				System.out.println("##끝나는 날짜:");
-				String end = sc.nextLine().trim();
-				l.deleteItem(item);
-				TodoItem t=new TodoItem(cate,new_title,new_description,end);
-				l.addItem(t);
-				System.out.println("업데이트 완료");
-				break;
-			}
-		}
-		if (cnt<num||cnt<=0) {
-			System.out.println("존재하지 않는 항목\n");
-			return;
-		}
+		sc.nextLine(); 
+					
+		System.out.println("##새로운 제목:");
+		String new_title = sc.nextLine().trim();
+		
+		System.out.println("##"+new_title+"의 새로운 내용:");
+		String new_description = sc.nextLine().trim();
+		System.out.println("##"+new_title+"의 새로운 카테고리:");
+		String cate = sc.nextLine().trim();
+		System.out.println("##끝나는 날짜:");
+		String end = sc.nextLine().trim();
+		
+		TodoItem t= new TodoItem(new_title,new_description,cate,end);
+		t.setId(num);
+		if(l.updateItem(t)>0)
+			System.out.println("업데이트 완료");
+		else System.out.println("업데이트 실패");
 	}
 
-	public static void listAll(TodoList l) {
+	public static void listAll(TodoList l, String orderby, int ordering) {
 		
-		System.out.println("전체 할 일 목록\n분야, 제목 , 내용, 시작 날짜, 끝나는 날짜\n");
-		int i=0;
-		for (TodoItem item : l.getList()) {
-			i++;
-			System.out.println( i+"번 "+item.getCategory() + " , " +item.getTitle() + " , " + item.getDesc()+" , "+item.getCurrent_date()+", "+item.getDue_date());
+		System.out.println("#전체 할 일 목록 "+l.getCnt()+"개\n"
+				+"#번호, 분야, 제목 , 내용, 시작 날짜, 끝나는 날짜\n");
+		for (TodoItem item : l.getOderedList(orderby, ordering)) {
+			System.out.println(item.toString()); 
 		}
 	}
 	
-	public static void find(TodoList l, String key) {
+	public static void findList(TodoList l, String key) {
 		int cnt=0;
-		for (TodoItem item : l.getList()) {
-			String title=item.getTitle();
-			String desc=item.getDesc();
-			if(find_(title, key)||find_(desc,key)) {
-				cnt++;
-				System.out.println(item.toString());
-			}
+		for (TodoItem item : l.getList(key)) {
+			System.out.println(item.toString());
+			cnt++;
 		}
 		System.out.println(cnt+"개의 할 일을 발견");
 	}
@@ -142,17 +113,24 @@ public class TodoUtil {
 		return false;
 	}
 	
-	public static void saveList(TodoList l,String file) throws IOException {
-		//file open
-		FileWriter f = new FileWriter(file,false);
-		for (TodoItem item : l.getList()) {
-			f.write(item.toSaveSTring());
-			//f.flush();
+	public static void findCateList(TodoList l, String cate) {
+		int cnt=0;
+		for(TodoItem item:l.getListCategory(cate)) {
+			System.out.println(item.toString());
+			cnt++;
 		}
-		//file close
-		f.close();
+		System.out.printf("\n총 %d개의 항목을 찾음\n",cnt);
 	}
 	
+	public static void listCateAll(TodoList l) {
+		int cnt=0;
+		for(String item: l.getCategories()) {
+			System.out.print(item+" ");
+			cnt++;
+		}
+		System.out.printf("\n총 %d개의 카테고리가 등록됨\n",cnt);
+	}
+
 	public static void loadList(TodoList l,String file) {
 		int num=0;
 		BufferedReader bf;
